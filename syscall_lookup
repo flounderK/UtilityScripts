@@ -1,0 +1,26 @@
+#!/usr/bin/python3
+from pwn import *
+import argparse
+import re
+
+
+parser = argparse.ArgumentParser(description="Basic syscall lookup tool")
+parser.add_argument('-a', '--arch', help="Architecture to look up syscall for",
+                    default="amd64")
+parser.add_argument('syscall', help='syscall number', type=str)
+args = parser.parse_args()
+
+context.arch = args.arch
+num_match = re.match(r'^(?P<HEX>0x)*(?P<VAL>[0-9A-Fa-f]+)$', args.syscall)
+if num_match is None:
+    print(args.syscall + " is not a valid integer")
+    exit(1)
+
+num = int(num_match.string, 10 if num_match.groupdict().get('HEX') is None else 16)
+scl = {getattr(constants, i): i for i in dir(constants) if i.startswith('SYS')}
+
+found_syscall = scl.get(num)
+if found_syscall is not None:
+    print(found_syscall)
+else:
+    print('No syscall found')
