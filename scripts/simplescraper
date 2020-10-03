@@ -47,6 +47,14 @@ def get_stylesheet_links(soup, response):
     return list(set(links))
 
 
+def get_js_links(soup, response):
+    """Returns an actual link to js scripts and the original relative link from the page"""
+    links = soup.find_all('script')
+    link_srcs = [link['src'] for link in links if link.has_attr('src') is True]
+    links = [(urljoin(response.url, src), src) if not src.startswith('http') else (src, src) for src in link_srcs]
+    return list(set(links))
+
+
 def get_usable_filename_from_url(url):
     """get a usable filename from a url. Pretty bad form but deals with sites like
     giphy that name all files the exact same thing"""
@@ -66,7 +74,7 @@ def download_media(url, destination, session=None):
                 f.write(chunk)
 
 
-def copy_page(url, destination_dir):
+def copy_page(url, destination_dir, args):
     s = requests.session()
     r = s.get(url)
     if r.status_code != 200:
@@ -84,7 +92,8 @@ def copy_page(url, destination_dir):
 
     img_links = get_img_links(soup, r)
     stylesheet_links = get_stylesheet_links(soup, r)
-    all_additional_links = img_links + stylesheet_links
+    js_links = get_js_links(soup, r) if args.download_js is True else []
+    all_additional_links = img_links + stylesheet_links + js_links
 
     updated_page = r.content
 
@@ -109,7 +118,7 @@ def copy_page(url, destination_dir):
     l.info('%s updated', base_page_path)
 
 
-def main(urls, destination_dir):
+def main(urls, destination_dir, args):
 
     destination_dir = os.path.abspath(destination_dir)
     # setup destination
@@ -117,7 +126,7 @@ def main(urls, destination_dir):
         os.mkdir(destination_dir)
 
     for url in urls:
-        copy_page(url, destination_dir)
+        copy_page(url, destination_dir, args)
 
 
 if __name__ == '__main__':
@@ -125,9 +134,11 @@ if __name__ == '__main__':
     description = """A basic scraper to make archived copies of websites.
     This scraper only downloads html, media files, and css"""
     parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('-j', '--download-js', action='store_true', default=False,
+                        help='Download js files')
     parser.add_argument('-d', '--destination', default=os.getcwd(),
                         help='Destination directory. Defaults to current directory')
     parser.add_argument('urls', nargs=argparse.REMAINDER, default=[],
                         help='Urls to scrape')
     args = parser.parse_args()
-    main(args.urls, args.destination)
+    main(args.urls, args.destination, args)
