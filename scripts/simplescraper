@@ -62,6 +62,10 @@ def get_usable_filename_from_url(url):
     giphy that name all files the exact same thing"""
     cleaned_url = url[url.index(':') + 1:] if ':' in url else url
     cleaned_url = cleaned_url.strip('/').replace('/', '_')
+    # clean js and css parameters?
+    cleaned_url = re.sub(r'(?<=\.css)(\?[^/]+)$', '', cleaned_url)
+    cleaned_url = re.sub(r'(?<=\.js)(\?[^/]+)$', '', cleaned_url)
+    cleaned_url = cleaned_url
     return cleaned_url
 
 
