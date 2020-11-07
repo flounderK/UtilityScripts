@@ -115,6 +115,15 @@ def copy_page(url, destination_dir, args):
     stylesheet_links = get_stylesheet_links(soup, r)
     js_links = get_js_links(soup, r) if args.ignore_js is False else []
     all_additional_links = img_links + stylesheet_links + js_links
+    if args.ignore is not None:
+        try:
+            ignore_regex = re.compile(args.ignore)
+            l.debug('%s', str(ignore_regex))
+            all_additional_links = [(link, rel_link) for link, rel_link in all_additional_links
+                                    if re.search(ignore_regex, rel_link) is None]
+        except:
+            l.warning('regex failed to compile, nothing will be ignored')
+
 
     updated_page = r.content
     created_files_relative_path = []
@@ -165,7 +174,10 @@ if __name__ == '__main__':
                         help='Destination directory. Defaults to current directory')
     parser.add_argument('-z', '--zip', action='store_true', default=False,
                         help='Automatically create a zip file containing all of the files from the site')
+    parser.add_argument('-i', '--ignore',
+                        help='Regex for filenames to ignore')
     parser.add_argument('urls', nargs=argparse.REMAINDER, default=[],
                         help='Urls to scrape')
     args = parser.parse_args()
+    print(args)
     main(args.urls, args.destination, args)
