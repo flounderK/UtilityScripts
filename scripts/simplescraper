@@ -113,7 +113,7 @@ def copy_page(url, destination_dir, args):
 
     img_links = get_img_links(soup, r)
     stylesheet_links = get_stylesheet_links(soup, r)
-    js_links = get_js_links(soup, r) if args.download_js is True else []
+    js_links = get_js_links(soup, r) if args.ignore_js is False else []
     all_additional_links = img_links + stylesheet_links + js_links
 
     updated_page = r.content
@@ -157,10 +157,10 @@ def main(urls, destination_dir, args):
 if __name__ == '__main__':
     import argparse
     description = """A basic scraper to make archived copies of websites.
-    This scraper only downloads html, media files, and css"""
+    This scraper only downloads html, media files, javascript files, and css"""
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('-j', '--download-js', action='store_true', default=False,
-                        help='Download js files')
+    parser.add_argument('-j', '--ignore-js', action='store_true', default=False,
+                        help='Do not download js files')
     parser.add_argument('-d', '--destination', default=os.getcwd(),
                         help='Destination directory. Defaults to current directory')
     parser.add_argument('-z', '--zip', action='store_true', default=False,
