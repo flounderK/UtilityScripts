@@ -11,16 +11,18 @@ parser.add_argument('syscall', help='syscall number', type=str)
 args = parser.parse_args()
 
 context.arch = args.arch
-num_match = re.match(r'^(?P<HEX>0x)*(?P<VAL>[0-9A-Fa-f]+)$', args.syscall)
-if num_match is None:
-    print(args.syscall + " is not a valid integer")
-    exit(1)
-
-num = int(num_match.string, 10 if num_match.groupdict().get('HEX') is None else 16)
 scl = {getattr(constants, i): i for i in dir(constants) if i.startswith('SYS')}
-
-found_syscall = scl.get(num)
-if found_syscall is not None:
-    print(found_syscall)
+num_match = re.match(r'^(?P<HEX>0x)*(?P<VAL>[0-9A-Fa-f]+)$', args.syscall)
+if num_match is not None:
+    num = int(num_match.string, 10 if num_match.groupdict().get('HEX') is None else 16)
+    found_syscall = scl.get(num)
+    if found_syscall is not None:
+        print(found_syscall)
+    else:
+        print('No syscall found')
 else:
-    print('No syscall found')
+    matches = {v: k for k, v in scl.items() if re.search(args.syscall, v, re.I) is not None}
+    for k, v in matches.items():
+        print('%s: %d : %s' % (k, v, hex(v)))
+
+
