@@ -38,6 +38,7 @@ def get_img_links(soup, response):
     imgs = soup.find_all('img')
     img_srcs = [img['src'] for img in imgs if img.has_attr('src') is True]
     links = [(urljoin(response.url, src), src) if not src.startswith('http') else (src, src) for src in img_srcs]
+    l.debug('%d image links found', len(links))
     return list(set(links))
 
 
@@ -46,6 +47,7 @@ def get_stylesheet_links(soup, response):
     links = soup.find_all('link')
     link_srcs = [link['href'] for link in links if link.has_attr('rel') is True and link['rel'] == ['stylesheet']]
     links = [(urljoin(response.url, src), src) if not src.startswith('http') else (src, src) for src in link_srcs]
+    l.debug('%d css links found', len(links))
     return list(set(links))
 
 
@@ -109,7 +111,7 @@ def copy_page(url, destination_dir, args):
     l.info('%s Downloaded and saved', base_page_filename)
 
     l.info('Beginning to download additional resources')
-    soup = BeautifulSoup(r.content, 'lxml')
+    soup = BeautifulSoup(r.content, 'html.parser')
 
     img_links = get_img_links(soup, r)
     stylesheet_links = get_stylesheet_links(soup, r)
@@ -176,8 +178,12 @@ if __name__ == '__main__':
                         help='Automatically create a zip file containing all of the files from the site')
     parser.add_argument('-i', '--ignore',
                         help='Regex for filenames to ignore')
+    parser.add_argument('--debug', action='store_true', default=False,
+                        help='Enable debug functionality, not fully implemented')
     parser.add_argument('urls', nargs=argparse.REMAINDER, default=[],
                         help='Urls to scrape')
     args = parser.parse_args()
-    print(args)
+    if args.debug is True:
+        l.setLevel(logging.DEBUG)
+    l.debug('%s', args)
     main(args.urls, args.destination, args)
