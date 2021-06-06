@@ -1,0 +1,3 @@
+[submodule "SimpleScraper"]
+	path = SimpleScraper
+	url = https://github.com/flounderK/SimpleScraper
