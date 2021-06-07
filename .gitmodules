@@ -1,3 +1,9 @@
 [submodule "SimpleScraper"]
 	path = SimpleScraper
 	url = https://github.com/flounderK/SimpleScraper
+[submodule "TypeConverter"]
+	path = TypeConverter
+	url = https://github.com/flounderK/TypeConverter
+[submodule "mktemplate"]
+	path = mktemplate
+	url = https://github.com/flounderK/mktemplate
