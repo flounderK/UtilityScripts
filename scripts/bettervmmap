@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+import os
+import re
+import argparse
+import logging
+
+l = logging.getLogger('bettervmmap')
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('%(levelname)-7s | %(asctime)-23s | %(message)s'))
+l.addHandler(handler)
+l.setLevel(logging.DEBUG)
+
+rexp = re.compile(r'(?P<START>[a-f0-9]+)-(?P<END>[a-f0-9]+) (?P<PERMISSIONS>[rwxp-]{4}) [a-f0-9]+ \d{2,}:\d{2,} \d+\s+(?P<OBJECT>[^ ].+)*')
+
+def getvmmap(pid, show_objects, addrs):
+    with open('/proc/%d/maps' % pid, 'r') as f:
+        maps = f.read().splitlines()
+
+    # start-end perms size object addrs
+    line_format = '%s-%s %s %s %s %s'
+
+    for line in maps:
+        match = re.search(rexp, line)
+        matchgroups = match.groupdict()
+        start = int(matchgroups['START'], 16)
+        end = int(matchgroups['END'], 16)
+        perms = matchgroups['PERMISSIONS']
+        obj = matchgroups.get('OBJECT')
+        obj = obj if obj is not None else ''
+        obj = obj if show_objects is True else ''
+        size = end - start
+        addrs_on_page = [hex(i) for i in addrs if start <= i < end]
+        arrow = '    <---  ' if addrs_on_page else ''
+        formatted_addrs = arrow + ','.join(addrs_on_page)
+        print(line_format % (hex(start), hex(end), perms, hex(size),
+                             obj, formatted_addrs))
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('pid', help='pid to get the map of', type=int)
+    parser.add_argument('-o', '--show-objects', action='store_true', default=False,
+                        help='Show objects')
+    parser.add_argument('addrs', nargs=argparse.REMAINDER, help='Addresses to point out')
+    args = parser.parse_args()
+    l.debug('All args %s', args)
+    addrs = [int(i, 16) for i in args.addrs]
+    getvmmap(args.pid, args.show_objects, addrs)
