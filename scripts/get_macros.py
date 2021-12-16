@@ -27,6 +27,10 @@ parser.add_argument("-c", "--keep-comments",
 parser.add_argument("-d", "--keep-defines",
                     default=False, action="store_true",
                     help="Keep in '#defines'. Ignored for python")
+parser.add_argument("-i", "--includes",
+                    default=False, action="store_true",
+                    help="Add includes into output "
+                         "(not valid for json)")
 args = parser.parse_args()
 
 
@@ -38,8 +42,9 @@ args = parser.parse_args()
 # )*  -- 0 or more of non captured group
 # .*)$  -- the rest of the macro after '#define' if it is single line, or
 #         the rest of the last line of the macro if it is multi line
-rexp = re.compile(r'(?m)^#define\s+((?:.*\\\r?\n)*.*)$')
+rexp = re.compile(r'(?m)^#\s*define\s+((?:.*\\\r?\n)*.*)$')
 multiline_comment_regex = re.compile(r"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/")
+include_rexp = re.compile(r'(#\s*include\s+.*)')
 with open(args.path, 'r') as f:
     content = f.read()
 
@@ -49,6 +54,7 @@ matches = [i.groups()[0] for i in re.finditer(rexp, content)]
 matches = [re.sub(r'\\*\s+', ' ', i) for i in matches]
 if args.keep_comments is False:
     matches = [re.sub(multiline_comment_regex, '', i) for i in matches]
+include_matches = [i.groups()[0] for i in re.finditer(include_rexp, content)]
 
 # separate out the function like macros from the object like
 split_matches = []
@@ -76,6 +82,12 @@ for i in matches:
         multiline.append(macrostring)
     else:
         singleline.append(macrostring)
+
+
+if args.includes is True:
+    for i in include_matches:
+        print('%s' % i)
+    print("")
 
 if args.singleline is True:
     for i in singleline:
