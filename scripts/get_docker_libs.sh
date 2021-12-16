@@ -4,7 +4,8 @@
 #
 
 usage () {
-	echo -e "Usage: $0 <docker_image>"
+	echo "Usage: $0 <docker_image>"
+	echo "    example: $0 'ubuntu:18.04'"
 }
 
 
