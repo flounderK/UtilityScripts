@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$#" -lt 1 ]; then
+	echo "$0: a script to scour man pages for the truely desperate"
+	echo "Usage: $0 <man args>"
+	echo "    example: $0 2 core"
+	exit 0
+fi
+
+man -a -w -K $@ | sort | uniq | grep --color=never -oP '(?<=/)[^/]+$' | grep --color=never -Po '^[^.]+' | xargs -I{} sh -c "man -f {}"
