@@ -10,3 +10,6 @@
 [submodule "BinClipper"]
 	path = BinClipper
 	url = https://github.com/flounderK/BinClipper
+[submodule "SyscallSearcher"]
+	path = SyscallSearcher
+	url = https://github.com/flounderK/SyscallSearcher.git
