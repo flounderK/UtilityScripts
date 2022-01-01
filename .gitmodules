@@ -1,15 +1,20 @@
 [submodule "SimpleScraper"]
 	path = SimpleScraper
 	url = https://github.com/flounderK/SimpleScraper
+	branch = master
 [submodule "TypeConverter"]
 	path = TypeConverter
 	url = https://github.com/flounderK/TypeConverter
+	branch = master
 [submodule "mktemplate"]
 	path = mktemplate
 	url = https://github.com/flounderK/mktemplate
+	branch = master
 [submodule "BinClipper"]
 	path = BinClipper
 	url = https://github.com/flounderK/BinClipper
+	branch = main
 [submodule "SyscallSearcher"]
 	path = SyscallSearcher
 	url = https://github.com/flounderK/SyscallSearcher.git
+	branch = main
