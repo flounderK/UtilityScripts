@@ -18,3 +18,7 @@
 	path = SyscallSearcher
 	url = https://github.com/flounderK/SyscallSearcher.git
 	branch = main
+[submodule "GithubReleaseDownloader"]
+	path = GithubReleaseDownloader
+	url = https://github.com/flounderK/GithubReleaseDownloader.git
+	branch = master
