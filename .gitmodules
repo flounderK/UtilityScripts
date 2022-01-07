@@ -22,3 +22,7 @@
 	path = GithubReleaseDownloader
 	url = https://github.com/flounderK/GithubReleaseDownloader.git
 	branch = master
+[submodule "ElfLibFixup"]
+	path = ElfLibFixup
+	url = https://github.com/flounderK/ElfLibFixup
+	branch = main
