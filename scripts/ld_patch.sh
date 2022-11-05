@@ -21,4 +21,4 @@ fi
 
 patchelf --set-interpreter "$interpreter" "$1"
 
-ln -s libc-*.so libc.so.6
+ln -s libc-*.so libc.so.6 2>/dev/null
