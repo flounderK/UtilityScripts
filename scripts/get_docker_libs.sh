@@ -16,12 +16,14 @@ fi
 
 cont_id=$(docker run -dit $1)
 
-ld_path=$(docker exec -it $cont_id bash -c 'ls /lib/**/ld-*.so' | tr -d '\r')
-ld_file=$(echo $ld_path | grep --color=never -Po '(?<=/)[^/]+\.so')
-libc_path=$(docker exec -it $cont_id bash -c 'ls /lib/**/libc-*.so' | tr -d '\r')
-libc_file=$(echo $libc_path | grep --color=never -Po '(?<=/)[^/]+\.so')
+ld_path=$(docker exec -it $cont_id sh -c 'ls -1 /lib/**/ld-*.so* /usr/lib/**/ld-*.so* 2>/dev/null | head -n1' | tr -d '\r')
+ld_file=$(echo $ld_path | grep --color=never -Po '(?<=/)[^/]+\.so(\.[^/]+)?')
+libc_path=$(docker exec -it $cont_id sh -c 'ls -1 /lib/**/libc-*.so* /lib/**/libc.so* /usr/lib/**/libc-*.so* /usr/lib/**/libc.so* 2>/dev/null | head -n1' | tr -d '\r')
+libc_file=$(echo $libc_path | grep --color=never -Po '(?<=/)[^/]+\.so(\.[^/]+)?')
 
 cont_name=$(docker ps --filter="id=$cont_id" --format='{{.Names}}')
+echo "ld $ld_path"
+echo "libc $libc_path"
 
 docker cp "$cont_id:$ld_path" $ld_file
 docker cp "$cont_id:$libc_path" $libc_file
