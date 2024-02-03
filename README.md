@@ -1,7 +1,7 @@
 # UtilityScripts
 Scripts that I use frequently. You know, like utilities.
 
-To install all of them, just run 
+To install all of them, just run
 ```bash
 ./install.sh
 ```
@@ -13,8 +13,30 @@ Utilizes pwntools to lookup which syscall a value maps to. Multiple architecture
 Pull down the specified docker container and copy its ld-x.xx.so and libc-x.xx.so to your current directory.
 
 ### __ld_patch.sh__
-Patch the specified binary to use the ld-*.so in your current directory. Just remember to LD_PRELOAD or LD_LOAD_LIBRARY the correct libc when launching the binary.
+Patch the specified binary to use the ld-*.so in your current directory. Just remember to `LD_PRELOAD` or `LD_LOAD_LIBRARY` the correct libc when launching the binary.
+This is meant to make CTF challenges runnable locally even if they are made for a completely different version of linux:
+```
+get_docker_libs.sh ubuntu:20.04
+cp chal chal.fix
+ld_patch.sh chal.fix
+LD_LIBRARY_PATH="$(pwd)" ./chal.fix
+```
 
+### __all_man_refs__
+`man --apropos <term>`, but actually searches through all of the man pages for the term in case there is just a passing reference to it.
+
+### __find_elf_defining_sym.sh___
+Find the elf shared object that defines a specific symbol. Meant for statically searching through firmware that has a lot of custom libraries in it without being able to run the firmware.
+
+### __get_macros.py__
+Try to extract the `C` macros from header files so that they can be hacked into other things. If you wanted to get all of the syscall numbers and make them python variables, you could do something like:
+
+```python
+get_macros.py -p /usr/include/asm-generic/unistd.h
+```
+
+### __uimage_wrap.py__
+script for shoving arbitrary files into the uimage format quickly
 
 ## __SimpleScraper__
 A very basic webscraper. Intended for archiving websites including all of the content/media/scripts that the site is hosting for that specific page. *note*, archiving medium.com posts is doable, but one of the js scripts changes the page to a 404 error if the site is not actually being hosted on medium.
